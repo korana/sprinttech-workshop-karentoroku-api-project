@@ -1,0 +1,74 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "darwin-arm64", "debian-openssl-1.1.x", "rhel-openssl-1.0.x"]
+  output        = "../prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int         @id @default(autoincrement())
+  name      String
+  username  String      @unique
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  EventType EventType[]
+}
+
+model EventType {
+  id        Int        @id @default(autoincrement())
+  name      String
+  user      User       @relation(fields: [username], references: [username])
+  username  String
+  dateSlots DateSlot[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model DateSlot {
+  id        Int       @id @default(autoincrement())
+  date      DateTime
+  eventType EventType @relation(fields: [eventId], references: [id])
+  eventId   Int
+  // daySlot         DaySlot          @relation(fields: [dayName], references: [day])
+  // dayName         String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  // dateOnTimeSlots DateOnTimeSlot[]
+}
+
+// model DaySlot {
+//   id        Int        @id @default(autoincrement())
+//   day       String     @unique
+//   createdAt DateTime   @default(now())
+//   updatedAt DateTime   @updatedAt
+//   dateSlots DateSlot[]
+// }
+
+// model DateOnTimeSlot {
+//   id        Int      @id @default(autoincrement())
+//   timeSlot  TimeSlot @relation(fields: [timeId], references: [id])
+//   timeId    Int
+//   dateSlot  DateSlot @relation(fields: [dateId], references: [id])
+//   dateId    Int
+//   status    String   @default("available")
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+// }
+
+// model TimeSlot {
+//   id             Int              @id @default(autoincrement())
+//   startTime      Int
+//   endTime        Int
+//   createdAt      DateTime         @default(now())
+//   updatedAt      DateTime         @updatedAt
+//   dayOnTimeSlots DateOnTimeSlot[]
+
+//   @@unique([startTime, endTime])
+// }
